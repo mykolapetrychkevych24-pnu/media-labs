@@ -19,15 +19,4 @@
       tracknumber: ['97']
 ```
 
-### Лаблоаторна робота №2:
-
-Install & Configure AWS client
-
-```
-    poetry add awscli
-    poetry run aws configure
-```
-
-```
-    poetry run python labs/lab_2/s3_transcribe.py --s3-bucket petrychkevych-lab-bucket --s3-key lab_2.mp3 --provider aws --aws-region eu-north-1 --output result.txt
-```
+![img_1.png](../../screenshots/img_1.png)

@@ -1,0 +1,85 @@
+{
+  "jobName": "transcribe_eb50ad9f",
+  "accountId": "411481400450",
+  "status": "COMPLETED",
+  "results": {
+    "transcripts": [
+      {
+        "transcript": "Привіт, як справи?"
+      }
+    ],
+    "items": [
+      {
+        "id": 0,
+        "type": "pronunciation",
+        "alternatives": [
+          {
+            "confidence": "0.986",
+            "content": "Привіт"
+          }
+        ],
+        "start_time": "0.039",
+        "end_time": "0.519"
+      },
+      {
+        "id": 1,
+        "type": "punctuation",
+        "alternatives": [
+          {
+            "confidence": "0.0",
+            "content": ","
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "type": "pronunciation",
+        "alternatives": [
+          {
+            "confidence": "0.82",
+            "content": "як"
+          }
+        ],
+        "start_time": "0.689",
+        "end_time": "1.0"
+      },
+      {
+        "id": 3,
+        "type": "pronunciation",
+        "alternatives": [
+          {
+            "confidence": "0.942",
+            "content": "справи"
+          }
+        ],
+        "start_time": "1.0",
+        "end_time": "1.37"
+      },
+      {
+        "id": 4,
+        "type": "punctuation",
+        "alternatives": [
+          {
+            "confidence": "0.0",
+            "content": "?"
+          }
+        ]
+      }
+    ],
+    "audio_segments": [
+      {
+        "id": 0,
+        "transcript": "Привіт, як справи?",
+        "start_time": "0.0",
+        "end_time": "1.549",
+        "items": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ]
+  }
+}
