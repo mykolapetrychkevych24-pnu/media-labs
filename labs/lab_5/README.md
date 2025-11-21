@@ -16,4 +16,6 @@ Run script:
 
 Result:
 
+![img.png](img.png)
+
 ![new_york_faces.jpeg](../../files/new_york_faces.jpeg)

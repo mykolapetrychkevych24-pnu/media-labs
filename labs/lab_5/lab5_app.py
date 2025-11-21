@@ -19,7 +19,65 @@ import cv2
 import numpy as np
 
 
-# ---------- Face detection + drawing ----------
+# ---------- JPEG validation & EXIF extraction ----------
+def is_jpeg_magic_bytes(path: str) -> bool:
+    """Check JPEG SOI marker (FF D8) at the file start."""
+    try:
+        with open(path, "rb") as f:
+            start = f.read(2)
+            return start == b"\xff\xd8"
+    except Exception:
+        return False
+
+
+def pil_verify_jpeg(path: str) -> bool:
+    """Use Pillow.verify() to check file integrity."""
+    try:
+        with Image.open(path) as im:
+            im.verify()
+        return True
+    except Exception:
+        return False
+
+
+def exif_to_dict(pil_img: Image.Image) -> Dict[str, Any]:
+    """Convert PIL EXIF to a JSON-serializable dict with human-readable tags."""
+    out: Dict[str, Any] = {}
+    try:
+        exif = pil_img.getexif()
+    except Exception:
+        exif = None
+
+    if not exif:
+        return {}
+
+    for tag_id, value in exif.items():
+        tag = ExifTags.TAGS.get(tag_id, tag_id)
+        if isinstance(value, bytes):
+            try:
+                value = value.decode("utf-8", errors="ignore")
+            except Exception:
+                value = repr(value)
+        if tag == "GPSInfo" and isinstance(value, dict):
+            gps = {}
+            for t, v in value.items():
+                subtag = ExifTags.GPSTAGS.get(t, t)
+                gps[subtag] = v
+            out[tag] = gps
+        else:
+            out[tag] = value
+    return out
+
+
+def apply_exif_orientation(pil_img: Image.Image) -> Image.Image:
+    """Apply EXIF orientation (uses Pillow helper)."""
+    try:
+        return ImageOps.exif_transpose(pil_img)
+    except Exception:
+        return pil_img
+
+
+# ---------- Face detection + drawing (UNCHANGED) ----------
 def detect_faces_and_draw(pil_img: Image.Image) -> Tuple[Image.Image, int]:
     """
     Detect frontal face projections using a Haar Cascade and draw red rectangles (BGR: (0,0,255)).
@@ -65,23 +123,43 @@ def main():
     base = p.stem
     out_image_path = p.with_name(f"{base}_faces{p.suffix}")
 
-    # Open with Pillow for further processing
-    try:
-        with Image.open(in_path) as img:
-            img_converted = img.convert("RGB")  # for compatibility with OpenCV
-    except Exception as e:
-        print("Failed to open image with Pillow:", e)
+    # 1) Validate JPEG
+    print("Checking JPEG magic bytes...")
+    if not is_jpeg_magic_bytes(in_path):
+        print("Not a JPEG file (missing SOI marker)")
         sys.exit(3)
 
-    # Apply cascade to detect faces and save the image with rectangles
+    print("Pillow verify()... ")
+    if not pil_verify_jpeg(in_path):
+        print("Pillow verify failed — file may be corrupted")
+        sys.exit(4)
+
+    # 2) Open with Pillow for EXIF and orientation
     try:
-        result_img, face_count = detect_faces_and_draw(img_converted)
+        with Image.open(in_path) as img:
+            exif = exif_to_dict(img)
+            img_oriented = apply_exif_orientation(img.convert("RGB"))
+    except Exception as e:
+        print("Failed to open image with Pillow:", e)
+        sys.exit(5)
+
+    # Print EXIF metadata to console (user requested no JSON file saving)
+    if exif:
+        print("EXIF metadata:")
+        for k, v in exif.items():
+            print(f"  {k}: {v}")
+    else:
+        print("No EXIF metadata found.")
+
+    # 3) Detect faces and draw
+    try:
+        result_img, face_count = detect_faces_and_draw(img_oriented)
         result_img.save(out_image_path, format="JPEG")
         print(f"Image with outlined faces saved to: {out_image_path}")
         print(f"Faces found: {face_count}")
     except Exception as e:
         print("Error detecting faces or saving image:", e)
-        sys.exit(4)
+        sys.exit(6)
 
 
 if __name__ == "__main__":
