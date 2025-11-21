@@ -4,7 +4,7 @@
 
     poetry install
 
-### Лаблоаторна робота №1:
+### Лабораторна робота №1:
 
 ```
     poetry run python labs/lab_1/media_info.py ./files/song.mp3
