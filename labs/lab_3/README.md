@@ -1,8 +1,14 @@
 ## Аналіз медіа файлів з використанням хмарних технологій та Python
 
-### Лаблоаторна робота №2:
+### Лаблоаторна робота №3:
 
-Install requirements
+Install requirements:
+
+```
+    poetry add requests spacy nltk langdetect
+```
+
+Load models and data:
 
 ```
     poetry run python -m spacy download en_core_web_sm
